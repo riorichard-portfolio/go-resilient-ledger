@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"go-resilient-ledger/internal/pkg/err/bizerr"
+	"go-resilient-ledger/internal/pkg/apperr"
 
 	"github.com/cockroachdb/errors"
 	ut "github.com/go-playground/universal-translator"
@@ -32,10 +32,10 @@ func NewErrHandler(
 				Message: fiberErr.Message,
 			})
 		}
-		var bizErr *bizerr.BizErr
-		if errors.As(err, &bizErr) {
-			return c.Status(bizErr.Code).JSON(ErrorResponse{
-				Message: bizErr.Message,
+		var appErr *apperr.AppErr
+		if errors.As(err, &appErr) {
+			return c.Status(appErr.Code).JSON(ErrorResponse{
+				Message: appErr.Message,
 			})
 		}
 		slog.Error("unhandled internal server error",

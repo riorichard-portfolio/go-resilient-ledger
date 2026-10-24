@@ -1,9 +1,9 @@
 package entity
 
-import "go-resilient-ledger/internal/pkg/err/bizerr"
+import "go-resilient-ledger/internal/pkg/apperr"
 
 var(
-	InvalidBalanceErr = bizerr.BadRequestErr("invalid balance number")
-	InvalidAmountErr = bizerr.BadRequestErr("invalid amount number")
-	InsufficientBalanceErr = bizerr.BadRequestErr("insufficient balance")
+	InvalidBalanceErr = apperr.BadRequestErr("invalid balance number")
+	InvalidAmountErr = apperr.BadRequestErr("invalid amount number")
+	InsufficientBalanceErr = apperr.BadRequestErr("insufficient balance")
 )
