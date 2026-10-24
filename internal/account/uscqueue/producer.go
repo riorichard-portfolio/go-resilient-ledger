@@ -19,7 +19,7 @@ func (p *Producer) AddCreateAccountQ(ctx context.Context, input createacc.Input)
 	case <-ctx.Done():
 		return ctx.Err()
 
-	case p.createAccountPQ.WorkQueue() <- createacc.WorkQueue{
+	case p.createAccountPQ.WorkQueue() <- createacc.WQdata{
 		Input: input,
 		Reply: replyChan,
 	}:
@@ -40,7 +40,7 @@ func (p *Producer) AddFindAccountQ(ctx context.Context, input findacc.Input) (fi
 	case <-ctx.Done():
 		return findacc.EmptyAccount, ctx.Err()
 
-	case p.findAccountPQ.WorkQueue() <- findacc.WorkQueue{
+	case p.findAccountPQ.WorkQueue() <- findacc.WQdata{
 		Input: input,
 		Reply: replyChan,
 	}:
