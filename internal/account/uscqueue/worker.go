@@ -16,7 +16,7 @@ type Worker struct {
 }
 
 func (w *Worker) runCreateAccountWorker() {
-	batch
+	batchWQData := make([]createacc.WQdata, 0, w.writeBatch)
 	for {
 		// select{
 		// 	case w.createAccountWQ.WorkQueue()
