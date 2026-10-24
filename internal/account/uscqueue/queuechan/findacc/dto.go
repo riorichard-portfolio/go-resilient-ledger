@@ -17,7 +17,7 @@ type Output struct {
 
 var EmptyAccount = Account{}
 
-type WorkQueue struct {
+type WQdata struct {
 	Input
 	Reply chan<- Output
 }

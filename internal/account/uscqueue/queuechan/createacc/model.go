@@ -2,16 +2,16 @@ package createacc
 
 // create account worker queue
 type CreateAccountWQ struct{
-	workQueue <-chan WorkQueue
+	workQueue <-chan WQdata
 	workerSlot int
 	totalWorker int
 }
 
-func(wq *CreateAccountWQ) WorkQueue()<-chan WorkQueue {return wq.workQueue}
+func(wq *CreateAccountWQ) WorkQueue()<-chan WQdata {return wq.workQueue}
 
 // create account producer queue
 type CreateAccountPQ struct{
-	workQueue chan<- WorkQueue
+	workQueue chan<- WQdata
 }
 
-func(pq *CreateAccountPQ) WorkQueue()chan<- WorkQueue {return pq.workQueue}
+func(pq *CreateAccountPQ) WorkQueue()chan<- WQdata {return pq.workQueue}

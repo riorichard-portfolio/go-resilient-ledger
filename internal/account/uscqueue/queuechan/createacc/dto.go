@@ -5,7 +5,7 @@ type Input struct {
 	Balance int
 }
 
-type WorkQueue struct {
+type WQdata struct {
 	Input
 	Reply chan<- error
 }
