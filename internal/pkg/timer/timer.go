@@ -6,13 +6,13 @@ import (
 
 type Timer struct {
 	timer      *time.Timer
-	c          <-chan time.Time
 	timeoutDur time.Duration
 }
 
-func NewTimer(timeoutMs int) (*Timer, error) {
+// timeoutMs default 10ms if timeoutMs <= 0 ms
+func NewTimer(timeoutMs int) (*Timer) {
 	if timeoutMs <= 0 {
-		return nil, InvalidTimeoutErr
+		timeoutMs = 10
 	}
 	dur := time.Duration(timeoutMs) * time.Millisecond
 	t := time.NewTimer(dur)
@@ -24,9 +24,8 @@ func NewTimer(timeoutMs int) (*Timer, error) {
 	}
 	return &Timer{
 		timer:      t,
-		c:          t.C,
 		timeoutDur: dur,
-	}, nil
+	}
 }
 
 func (t *Timer) drainTimerC() {
@@ -48,5 +47,5 @@ func (t *Timer) Stop() {
 }
 
 func (t *Timer) Timeout() <-chan time.Time {
-	return t.c
+	return t.timer.C
 }
