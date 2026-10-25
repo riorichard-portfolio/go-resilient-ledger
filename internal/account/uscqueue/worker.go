@@ -28,6 +28,9 @@ func (w *Worker) runCreateAccountWorker(ctx context.Context) {
 			return
 		case data, ok := <-w.createAccountWQ.WorkQueue():
 			if !ok {
+				if len(batchWQData) > 0 {
+					// usecase dipnggil
+				}
 				return
 			}
 
@@ -49,4 +52,48 @@ func (w *Worker) runCreateAccountWorker(ctx context.Context) {
 			}
 		}
 	}
+}
+
+func (w *Worker) runFindAccountWorker(ctx context.Context) {
+	batchWQData := make([]findacc.WQdata, 0, w.readBatch)
+	t := timer.NewTimer(w.waitTimeoutMs)
+	for {
+		select {
+		case <-ctx.Done():
+			if len(batchWQData) > 0 {
+				// usecase dipnggil
+			}
+			return
+		case data, ok := <-w.findAccountWQ.WorkQueue():
+			if !ok {
+				if len(batchWQData) > 0 {
+					// usecase dipnggil
+				}
+				return
+			}
+
+			batchWQData = append(batchWQData, data)
+
+			if len(batchWQData) == 1 {
+				t.Start()
+			}
+
+			if len(batchWQData) >= w.readBatch {
+				t.Stop()
+				// usecase dipnggil
+				batchWQData = batchWQData[:0]
+			}
+		case <-t.Timeout():
+			if len(batchWQData) > 0 {
+				// usecase dipnggil
+				batchWQData = batchWQData[:0]
+			}
+		}
+	}
+}
+
+func (w *Worker) StartWorker(ctx context.Context) {
+
+	go w.runCreateAccountWorker(ctx)
+	go w.runFindAccountWorker(ctx)
 }
