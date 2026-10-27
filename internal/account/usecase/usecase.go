@@ -5,11 +5,12 @@ import (
 
 	"go-resilient-ledger/internal/account/entity"
 	"go-resilient-ledger/internal/account/uscqueue/queuechan/createacc"
+	"go-resilient-ledger/internal/account/uscqueue/queuechan/findacc"
 )
 
 type Repo interface {
 	BulkSaveNew(data []entity.Account) error
-	FindByIds(ids []string) []entity.Account
+	BulkFindByIds(ids []string) (map[string]AccountMapVal, error)
 }
 
 type Usecase struct {
@@ -46,5 +47,35 @@ func (u *Usecase) BulkCreateAccount(data []createacc.WQdata) {
 	err := u.repo.BulkSaveNew(bulkAccounts)
 	for _, index := range successIndices {
 		data[index].Reply <- err
+	}
+}
+
+func (u *Usecase) BulkFindAccounts(data []findacc.WQdata) {
+	ids := make([]string, 0, len(data))
+	seenIds := make(map[string]struct{}, len(data))
+	for _, item := range data {
+		_, exists := seenIds[item.ID]
+		if !exists {
+			ids = append(ids, item.ID)
+			seenIds[item.ID] = struct{}{}
+		}
+	}
+	accountMap, err := u.repo.BulkFindByIds(ids)
+	for _, item := range data {
+		accVal, exists := accountMap[item.ID]
+		output := findacc.Output{
+			Account: findacc.Account{
+				ID:      item.ID,
+				Name:    accVal.Name,
+				Balance: accVal.Balance,
+			},
+			Err: nil,
+		}
+		if err != nil {
+			output.Err = err
+		} else if !exists {
+			output.Err = AccountNotFoundErr
+		}
+		item.Reply <- output
 	}
 }
