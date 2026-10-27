@@ -24,7 +24,7 @@ func NewUsecase(
 	}
 }
 
-func (u *Usecase) CreateAccount(data []createacc.WQdata) {
+func (u *Usecase) BulkCreateAccount(data []createacc.WQdata) {
 	bulkAccounts := make([]entity.Account, 0, len(data))
 	successIndices := make([]int, 0, len(data))
 	for i, item := range data {
