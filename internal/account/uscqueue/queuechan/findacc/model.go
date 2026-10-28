@@ -13,3 +13,13 @@ type FindAccountPQ struct {
 }
 
 func (pq *FindAccountPQ) WorkQueue() chan<- WQdata { return pq.workQueue }
+
+func NewFindAccountWQ(
+	wq chan WQdata,
+) (*FindAccountWQ,*FindAccountPQ) {
+	return &FindAccountWQ{
+		workQueue: wq,
+	}, &FindAccountPQ{
+		workQueue: wq,
+	}
+}

@@ -9,8 +9,8 @@ import (
 )
 
 type Producer struct {
-	createAccountPQ createacc.CreateAccountPQ
-	findAccountPQ   findacc.FindAccountPQ
+	createAccountPQ *createacc.CreateAccountPQ
+	findAccountPQ   *findacc.FindAccountPQ
 }
 
 func (p *Producer) AddCreateAccountQ(ctx context.Context, input createacc.Input) error {

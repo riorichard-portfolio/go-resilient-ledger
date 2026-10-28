@@ -2,6 +2,7 @@ package uscqueue
 
 import (
 	"context"
+	"log"
 
 	"go-resilient-ledger/internal/account/uscqueue/queuechan/createacc"
 	"go-resilient-ledger/internal/account/uscqueue/queuechan/findacc"
@@ -9,8 +10,8 @@ import (
 )
 
 type Worker struct {
-	createAccountWQ createacc.CreateAccountWQ
-	findAccountWQ   findacc.FindAccountWQ
+	createAccountWQ *createacc.CreateAccountWQ
+	findAccountWQ   *findacc.FindAccountWQ
 	writeBatch      int
 	readBatch       int
 	waitTimeoutMs   int
@@ -93,7 +94,7 @@ func (w *Worker) runFindAccountWorker(ctx context.Context) {
 }
 
 func (w *Worker) StartWorker(ctx context.Context) {
-
 	go w.runCreateAccountWorker(ctx)
 	go w.runFindAccountWorker(ctx)
+	log.Println("worker running")
 }

@@ -2,15 +2,18 @@ package account
 
 import (
 	"go-resilient-ledger/internal/account/gormrepo"
+	"go-resilient-ledger/internal/account/uscqueue"
 	"go-resilient-ledger/internal/account/usecase"
 
 	"gorm.io/gorm"
 )
 
 type Container struct {
-	GormRepo *gormrepo.GormRepo
+	gormRepo *gormrepo.GormRepo
+	usc      *usecase.Usecase
 
-	usc *usecase.Usecase
+	QWorker   *uscqueue.Worker
+	QProducer *uscqueue.Producer
 }
 
 func (c *Container) Usecase() *usecase.Usecase {
@@ -18,7 +21,7 @@ func (c *Container) Usecase() *usecase.Usecase {
 		return c.usc
 	}
 	c.usc = usecase.NewUsecase(
-		c.GormRepo,
+		c.gormRepo,
 	)
 	return c.usc
 }
@@ -27,7 +30,16 @@ func NewContainer(
 	db *gorm.DB,
 ) *Container {
 	gormRepo := gormrepo.NewRepo(db)
+	w, p := uscqueue.NewQueueSys(uscqueue.Config{
+		CreateAccQSize: 3000,
+		FindAccQSize:   3000,
+		ReadBatchSize:  100,
+		WriteBatchSize: 500,
+		WaitTimeoutMs:  10,
+	})
 	return &Container{
-		GormRepo: gormRepo,
+		gormRepo:  gormRepo,
+		QWorker:   w,
+		QProducer: p,
 	}
 }
