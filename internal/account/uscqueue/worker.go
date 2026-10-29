@@ -6,6 +6,7 @@ import (
 
 	"go-resilient-ledger/internal/account/uscqueue/queuechan/createacc"
 	"go-resilient-ledger/internal/account/uscqueue/queuechan/findacc"
+	"go-resilient-ledger/internal/account/usecase"
 	"go-resilient-ledger/internal/pkg/timer"
 )
 
@@ -15,6 +16,7 @@ type Worker struct {
 	writeBatch      int
 	readBatch       int
 	waitTimeoutMs   int
+	usc             *usecase.Usecase
 }
 
 func (w *Worker) runCreateAccountWorker(ctx context.Context) {
@@ -25,12 +27,14 @@ func (w *Worker) runCreateAccountWorker(ctx context.Context) {
 		case <-ctx.Done():
 			if len(batchWQData) > 0 {
 				// usecase dipnggil
+				w.usc.BulkCreateAccount(batchWQData)
 			}
 			return
 		case data, ok := <-w.createAccountWQ.WorkQueue():
 			if !ok {
 				if len(batchWQData) > 0 {
 					// usecase dipnggil
+					w.usc.BulkCreateAccount(batchWQData)
 				}
 				return
 			}
@@ -44,11 +48,13 @@ func (w *Worker) runCreateAccountWorker(ctx context.Context) {
 			if len(batchWQData) >= w.writeBatch {
 				t.Stop()
 				// usecase dipnggil
+				w.usc.BulkCreateAccount(batchWQData)
 				batchWQData = batchWQData[:0]
 			}
 		case <-t.Timeout():
 			if len(batchWQData) > 0 {
 				// usecase dipnggil
+				w.usc.BulkCreateAccount(batchWQData)
 				batchWQData = batchWQData[:0]
 			}
 		}
@@ -63,12 +69,14 @@ func (w *Worker) runFindAccountWorker(ctx context.Context) {
 		case <-ctx.Done():
 			if len(batchWQData) > 0 {
 				// usecase dipnggil
+				w.usc.BulkFindAccounts(batchWQData)
 			}
 			return
 		case data, ok := <-w.findAccountWQ.WorkQueue():
 			if !ok {
 				if len(batchWQData) > 0 {
 					// usecase dipnggil
+					w.usc.BulkFindAccounts(batchWQData)
 				}
 				return
 			}
@@ -82,11 +90,13 @@ func (w *Worker) runFindAccountWorker(ctx context.Context) {
 			if len(batchWQData) >= w.readBatch {
 				t.Stop()
 				// usecase dipnggil
+				w.usc.BulkFindAccounts(batchWQData)
 				batchWQData = batchWQData[:0]
 			}
 		case <-t.Timeout():
 			if len(batchWQData) > 0 {
 				// usecase dipnggil
+				w.usc.BulkFindAccounts(batchWQData)
 				batchWQData = batchWQData[:0]
 			}
 		}

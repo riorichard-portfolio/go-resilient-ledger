@@ -16,27 +16,18 @@ type Container struct {
 	QProducer *uscqueue.Producer
 }
 
-func (c *Container) Usecase() *usecase.Usecase {
-	if c.usc != nil {
-		return c.usc
-	}
-	c.usc = usecase.NewUsecase(
-		c.gormRepo,
-	)
-	return c.usc
-}
-
 func NewContainer(
 	db *gorm.DB,
 ) *Container {
 	gormRepo := gormrepo.NewRepo(db)
+	usc := usecase.NewUsecase(gormRepo)
 	w, p := uscqueue.NewQueueSys(uscqueue.Config{
-		CreateAccQSize: 3000,
+		CreateAccQSize: 10000,
 		FindAccQSize:   3000,
 		ReadBatchSize:  100,
-		WriteBatchSize: 500,
+		WriteBatchSize: 2000,
 		WaitTimeoutMs:  10,
-	})
+	}, usc)
 	return &Container{
 		gormRepo:  gormRepo,
 		QWorker:   w,
