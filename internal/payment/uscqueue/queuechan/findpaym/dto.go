@@ -1,7 +1,11 @@
 package findpaym
 
+import "go-resilient-ledger/internal/pkg/listf"
+
 type Input struct {
-	ID string
+	ID    string
+	ReqID string
+	listf.Filter
 }
 
 type Payment struct {
