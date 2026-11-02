@@ -14,7 +14,7 @@ type PaymentMapVal struct {
 }
 
 type BulkFindInput struct {
-	ID    string
-	ReqID string
+	AccountID string
+	ReqID     string
 	listf.Filter
 }

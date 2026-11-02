@@ -7,8 +7,8 @@ import (
 )
 
 type Input struct {
-	ID    string
-	ReqID string
+	AccountID string
+	ReqID     string
 	listf.Filter
 }
 
