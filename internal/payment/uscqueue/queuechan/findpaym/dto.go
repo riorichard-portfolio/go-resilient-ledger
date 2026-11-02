@@ -1,6 +1,10 @@
 package findpaym
 
-import "go-resilient-ledger/internal/pkg/listf"
+import (
+	"time"
+
+	"go-resilient-ledger/internal/pkg/listf"
+)
 
 type Input struct {
 	ID    string
@@ -12,6 +16,7 @@ type Payment struct {
 	ID        string
 	AccountID string
 	Amount    int
+	CreatedAt time.Time
 }
 
 type Output struct {

@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 
 	"go-resilient-ledger/internal/payment/entity"
@@ -34,11 +36,13 @@ func (u *Usecase) BulkCreatePayment(data []createpaym.WQdata) {
 	payments := make([]entity.Payment, 0, len(data))
 	accIds := make([]string, 0, len(data))
 	successIndices := make([]int, 0, len(data))
+	now := time.Now().UTC()
 	for i, d := range data {
 		payment, err := entity.NewPayment(
 			uuid.NewString(),
 			d.AccountID,
 			d.Amount,
+			now,
 		)
 		if err != nil {
 			d.Reply <- err
