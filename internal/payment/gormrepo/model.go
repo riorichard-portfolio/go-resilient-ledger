@@ -8,3 +8,8 @@ type PaymentGorm struct {
 	Amount    int       `gorm:"type:int;column:amount;not null"`
 	CreatedAt time.Time `gorm:"column:created_at;not null"`
 }
+
+type BulkFindRes struct {
+	QueryID string `gorm:"type:varchar(255);column:query_id;not null"`
+	PaymentGorm
+}

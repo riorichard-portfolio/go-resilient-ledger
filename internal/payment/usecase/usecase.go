@@ -89,7 +89,7 @@ func (u *Usecase) BulkFindPayments(data []findpaym.WQdata) {
 	for _, d := range data {
 		queries = append(queries, BulkFindInput{
 			AccountID: d.AccountID,
-			ReqID:     d.ReqID,
+			QueryID:     d.ReqID,
 			Filter:    d.Filter,
 		})
 	}
