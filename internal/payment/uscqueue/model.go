@@ -1,8 +1,8 @@
 package uscqueue
 
 type Config struct {
-	CreateAccQSize int
-	FindAccQSize   int
+	CreatePaymQSize int
+	FindPaymQSize   int
 	ReadBatchSize  int
 	WriteBatchSize int
 	WaitTimeoutMs   int
