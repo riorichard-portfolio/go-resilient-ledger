@@ -11,6 +11,7 @@ import (
 	"go-resilient-ledger/internal/infra/validator"
 
 	"go-resilient-ledger/internal/account"
+	"go-resilient-ledger/internal/payment"
 )
 
 func main() {
@@ -33,11 +34,16 @@ func main() {
 	fiberApp := fiberhttp.NewApp(fiberErrHandler, appCfg.AppConfig.TimeoutDur)
 
 	accountCont := account.NewContainer(gormDB)
+	paymentCont := payment.NewContainer(gormDB, accountCont.Service)
 
 	accountWCtx := context.Background()
 	accountCont.QWorker.StartWorker(accountWCtx)
 
+	paymentWCtx := context.Background()
+	paymentCont.QWorker.StartWorker(paymentWCtx)
+
 	account.RegisterAPI(fiberApp, *accountCont.QProducer)
+	payment.RegisterAPI(fiberApp, *paymentCont.QProducer)
 
 	addr := fmt.Sprintf(":%d", appCfg.AppConfig.Port)
 
