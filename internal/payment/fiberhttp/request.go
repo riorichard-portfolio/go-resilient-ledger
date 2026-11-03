@@ -2,12 +2,12 @@ package fiberhttp
 
 import "go-resilient-ledger/internal/pkg/listf"
 
-type CreatePayment struct {
+type CreatePaymentReq struct {
 	AccountID string `json:"account_id" validate:"required"`
 	Amount    int    `json:"amount" validate:"required"`
 }
 
-type FindPayment struct {
+type FindPaymentsReq struct {
 	AccountID string `json:"account_id" validate:"required"`
 	listf.FilterJson
 }

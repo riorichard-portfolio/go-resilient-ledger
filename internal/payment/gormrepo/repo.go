@@ -39,15 +39,15 @@ func (gr *GormRepo) BulkSaveNew(data []entity.Payment) error {
 	return nil
 }
 
-func (gr *GormRepo) BulkFind(queries []usecase.BulkFindInput) (map[string][]usecase.PaymentMapVal, error) {
+func (gr *GormRepo) BulkFind(queries []usecase.BulkFindInput) (map[int][]usecase.PaymentMapVal, error) {
 	if len(queries) == 0 {
-		return make(map[string][]usecase.PaymentMapVal), nil
+		return make(map[int][]usecase.PaymentMapVal), nil
 	}
 	values := make([]string, 0, len(queries))
 	args := make([]interface{}, 0, 5*len(queries))
 
 	for _, q := range queries {
-		values = append(values, "(?::text, ?::text, ?::timestamptz, ?::timestamptz, ?::int)")
+		values = append(values, "(?::int, ?::text, ?::timestamptz, ?::timestamptz, ?::int)")
 
 		args = append(args,
 			q.QueryID,
@@ -85,7 +85,7 @@ func (gr *GormRepo) BulkFind(queries []usecase.BulkFindInput) (map[string][]usec
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to bulk find payments")
 	}
-	result := make(map[string][]usecase.PaymentMapVal, len(queries))
+	result := make(map[int][]usecase.PaymentMapVal, len(queries))
 	for _, dr := range dbResults {
 		if dr.ID == "" {
 			continue

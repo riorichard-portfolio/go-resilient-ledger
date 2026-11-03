@@ -10,6 +10,6 @@ type PaymentGorm struct {
 }
 
 type BulkFindRes struct {
-	QueryID string `gorm:"type:varchar(255);column:query_id;not null"`
+	QueryID int `gorm:"type:int;column:query_id;not null"`
 	PaymentGorm
 }

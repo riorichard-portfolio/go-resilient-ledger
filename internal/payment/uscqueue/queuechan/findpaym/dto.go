@@ -8,7 +8,6 @@ import (
 
 type Input struct {
 	AccountID string
-	ReqID     string
 	listf.Filter
 }
 

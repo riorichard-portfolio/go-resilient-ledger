@@ -12,7 +12,7 @@ import (
 
 type Repo interface {
 	BulkSaveNew(data []entity.Payment) error
-	BulkFind(queries []BulkFindInput) (map[string][]PaymentMapVal, error)
+	BulkFind(queries []BulkFindInput) (map[int][]PaymentMapVal, error)
 }
 
 type AccountSvc interface {
@@ -26,9 +26,11 @@ type Usecase struct {
 
 func NewUsecase(
 	repo Repo,
+	accSvc AccountSvc,
 ) *Usecase {
 	return &Usecase{
-		repo: repo,
+		repo:   repo,
+		accSvc: accSvc,
 	}
 }
 
@@ -86,10 +88,10 @@ func (u *Usecase) BulkCreatePayment(data []createpaym.WQdata) {
 
 func (u *Usecase) BulkFindPayments(data []findpaym.WQdata) {
 	queries := make([]BulkFindInput, 0, len(data))
-	for _, d := range data {
+	for i, d := range data {
 		queries = append(queries, BulkFindInput{
 			AccountID: d.AccountID,
-			QueryID:     d.ReqID,
+			QueryID:   i,
 			Filter:    d.Filter,
 		})
 	}
@@ -102,8 +104,8 @@ func (u *Usecase) BulkFindPayments(data []findpaym.WQdata) {
 		}
 		return
 	}
-	for _, d := range data {
-		payments := paymentsReqMap[d.ReqID]
+	for i, d := range data {
+		payments := paymentsReqMap[i]
 		paymentsReply := make([]findpaym.Payment, 0, len(payments))
 		for _, p := range payments {
 			paymentsReply = append(paymentsReply, findpaym.Payment{
