@@ -22,7 +22,7 @@ func NewRepo(
 	}
 }
 
-func (gr *GormRepo) BulkSaveNew(data []entity.Payment) error {
+func (gr *GormRepo) BulkInsert(data []entity.Payment) error {
 	bulkData := make([]PaymentGorm, 0, len(data))
 	for _, p := range data {
 		bulkData = append(bulkData, PaymentGorm{

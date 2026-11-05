@@ -2,6 +2,7 @@ package service
 
 type Repo interface {
 	BulkFindByIds(ids []string) (map[string]AccountMapVal, error)
+	BulkAddBalance(bmap map[string]int) error
 }
 
 type Service struct {
@@ -26,4 +27,8 @@ func (s *Service) FindValidAccs(accIds []string) (map[string]struct{}, error) {
 		result[id] = struct{}{}
 	}
 	return result, nil
+}
+
+func (s *Service) AddAccsBalance(bmap map[string]int) error {
+	return s.repo.BulkAddBalance(bmap)
 }

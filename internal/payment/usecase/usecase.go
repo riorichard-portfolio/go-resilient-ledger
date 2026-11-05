@@ -8,10 +8,10 @@ import (
 	"go-resilient-ledger/internal/payment/entity"
 	"go-resilient-ledger/internal/payment/uscqueue/queuechan/createpaym"
 	"go-resilient-ledger/internal/payment/uscqueue/queuechan/findpaym"
+	txpkg "go-resilient-ledger/internal/pkg/transaction"
 )
 
 type Repo interface {
-	BulkSaveNew(data []entity.Payment) error
 	BulkFind(queries []BulkFindInput) (map[int][]PaymentMapVal, error)
 }
 
@@ -19,18 +19,39 @@ type AccountSvc interface {
 	FindValidAccs(accIds []string) (map[string]struct{}, error)
 }
 
+type TxRepo interface {
+	BulkInsert(data []entity.Payment) error
+}
+
+type TxAccountSvc interface {
+	AddAccsBalance(bmap map[string]int) error
+}
+
+type Transaction struct {
+	Repo   TxRepo
+	AccSvc TxAccountSvc
+	txpkg.Transaction
+}
+
+type TxManager interface {
+	New() (*Transaction, error)
+}
+
 type Usecase struct {
-	repo   Repo
-	accSvc AccountSvc
+	repo      Repo
+	accSvc    AccountSvc
+	txManager TxManager
 }
 
 func NewUsecase(
 	repo Repo,
 	accSvc AccountSvc,
+	txManager TxManager,
 ) *Usecase {
 	return &Usecase{
-		repo:   repo,
-		accSvc: accSvc,
+		repo:      repo,
+		accSvc:    accSvc,
+		txManager: txManager,
 	}
 }
 
@@ -80,10 +101,33 @@ func (u *Usecase) BulkCreatePayment(data []createpaym.WQdata) {
 	}
 	payments = payments[:validIdx]
 	successIndices = successIndices[:validIdx]
-	err = u.repo.BulkSaveNew(payments)
-	for _, si := range successIndices {
-		data[si].Reply <- err
+	balanceMap := make(map[string]int, len(payments))
+	for _, p := range payments {
+		balanceMap[p.AccountID()] += p.Amount()
 	}
+	tx, err := u.txManager.New()
+	if err != nil {
+		for _, si := range successIndices {
+			data[si].Reply <- err
+		}
+		return
+	}
+	defer tx.Rollback()
+	err = tx.Repo.BulkInsert(payments)
+	if err != nil {
+		for _, si := range successIndices {
+			data[si].Reply <- err
+		}
+		return
+	}
+	err = tx.AccSvc.AddAccsBalance(balanceMap)
+	if err != nil {
+		for _, si := range successIndices {
+			data[si].Reply <- err
+		}
+		return
+	}
+	tx.Commit()
 }
 
 func (u *Usecase) BulkFindPayments(data []findpaym.WQdata) {

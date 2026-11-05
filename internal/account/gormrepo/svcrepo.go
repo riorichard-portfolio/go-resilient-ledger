@@ -1,6 +1,9 @@
 package gormrepo
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/cockroachdb/errors"
 	"gorm.io/gorm"
 
@@ -36,4 +39,32 @@ func (gr *SvcGormRepo) BulkFindByIds(ids []string) (map[string]service.AccountMa
 		}
 	}
 	return result, nil
+}
+
+func (gr *SvcGormRepo) BulkAddBalance(bmap map[string]int) error {
+	// Jika map kosong, langsung return tanpa eksekusi query
+	if len(bmap) == 0 {
+		return nil
+	}
+
+	var valueRows []string
+	var args []interface{}
+
+	// Iterasi map untuk menyiapkan baris nilai dan parameter binding
+	for accID, delta := range bmap {
+		valueRows = append(valueRows, "(?, ?::int)") // Cast tipe data integer jika diperlukan
+		args = append(args, accID, delta)
+	}
+
+	// Susun query PostgreSQL menggunakan VALUES table expression
+	// Asumsi nama tabel di database adalah "accounts", dengan kolom "id" dan "balance"
+	query := fmt.Sprintf(`
+		UPDATE accounts AS a 
+		SET balance = a.balance + v.delta 
+		FROM (VALUES %s) AS v(id, delta) 
+		WHERE a.id = v.id
+	`, strings.Join(valueRows, ", "))
+
+	// Eksekusi secara aman dengan GORM db.Exec (1 roundtrip)
+	return gr.db.Exec(query, args...).Error
 }

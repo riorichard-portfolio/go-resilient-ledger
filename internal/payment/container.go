@@ -2,6 +2,7 @@ package payment
 
 import (
 	"go-resilient-ledger/internal/payment/gormrepo"
+	"go-resilient-ledger/internal/payment/gormtx"
 	"go-resilient-ledger/internal/payment/uscqueue"
 	"go-resilient-ledger/internal/payment/usecase"
 
@@ -22,7 +23,8 @@ func NewContainer(
 	accSvc *accsvc.Service,
 ) *Container {
 	uscRepo := gormrepo.NewRepo(db)
-	usc := usecase.NewUsecase(uscRepo, accSvc)
+	txManager := gormtx.NewGormTxManager(db)
+	usc := usecase.NewUsecase(uscRepo, accSvc, txManager)
 	w, p := uscqueue.NewQueueSys(uscqueue.Config{
 		CreatePaymQSize: 10000,
 		FindPaymQSize:   3000,
