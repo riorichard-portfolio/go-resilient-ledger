@@ -128,6 +128,9 @@ func (u *Usecase) BulkCreatePayment(data []createpaym.WQdata) {
 		return
 	}
 	tx.Commit()
+	for _, si := range successIndices {
+		data[si].Reply <- nil
+	}
 }
 
 func (u *Usecase) BulkFindPayments(data []findpaym.WQdata) {

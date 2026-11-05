@@ -52,7 +52,7 @@ func (gr *SvcGormRepo) BulkAddBalance(bmap map[string]int) error {
 
 	// Iterasi map untuk menyiapkan baris nilai dan parameter binding
 	for accID, delta := range bmap {
-		valueRows = append(valueRows, "(?, ?::int)") // Cast tipe data integer jika diperlukan
+		valueRows = append(valueRows, "(?::uuid, ?::int)") // Cast tipe data integer jika diperlukan
 		args = append(args, accID, delta)
 	}
 
