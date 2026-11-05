@@ -59,7 +59,7 @@ func (gr *SvcGormRepo) BulkAddBalance(bmap map[string]int) error {
 	// Susun query PostgreSQL menggunakan VALUES table expression
 	// Asumsi nama tabel di database adalah "accounts", dengan kolom "id" dan "balance"
 	query := fmt.Sprintf(`
-		UPDATE accounts AS a 
+		UPDATE account_gorms AS a 
 		SET balance = a.balance + v.delta 
 		FROM (VALUES %s) AS v(id, delta) 
 		WHERE a.id = v.id
