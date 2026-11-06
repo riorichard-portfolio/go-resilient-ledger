@@ -42,7 +42,7 @@ func main() {
 	paymentWCtx := context.Background()
 	paymentCont.QWorker.StartWorker(paymentWCtx)
 
-	account.RegisterAPI(fiberApp, *accountCont.QProducer)
+	account.RegisterAPI(fiberApp, *accountCont.QProducer, accountCont.Usc)
 	payment.RegisterAPI(fiberApp, *paymentCont.QProducer)
 
 	addr := fmt.Sprintf(":%d", appCfg.AppConfig.Port)

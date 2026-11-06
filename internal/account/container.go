@@ -10,7 +10,7 @@ import (
 )
 
 type Container struct {
-	usc *usecase.Usecase
+	Usc *usecase.Usecase
 
 	QWorker   *uscqueue.Worker
 	QProducer *uscqueue.Producer
@@ -35,5 +35,6 @@ func NewContainer(
 		QWorker:   w,
 		QProducer: p,
 		Service:   svc,
+		Usc:       usc,
 	}
 }

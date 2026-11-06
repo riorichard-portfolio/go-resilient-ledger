@@ -6,17 +6,21 @@ import (
 	"go-resilient-ledger/internal/account/uscqueue"
 	"go-resilient-ledger/internal/account/uscqueue/queuechan/createacc"
 	"go-resilient-ledger/internal/account/uscqueue/queuechan/findacc"
+	"go-resilient-ledger/internal/account/usecase"
 )
 
 type Handler struct {
 	producer uscqueue.Producer
+	usc *usecase.Usecase
 }
 
 func NewHandler(
 	producer uscqueue.Producer,
+	usc *usecase.Usecase,
 ) *Handler {
 	return &Handler{
 		producer: producer,
+		usc: usc,
 	}
 }
 
