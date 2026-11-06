@@ -29,7 +29,7 @@ func NewContainer(
 		CreatePaymQSize: 10000,
 		FindPaymQSize:   3000,
 		ReadBatchSize:   100,
-		WriteBatchSize:  2000,
+		WriteBatchSize:  5000,
 		WaitTimeoutMs:   10,
 	}, usc)
 	return &Container{

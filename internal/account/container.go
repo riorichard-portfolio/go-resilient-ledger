@@ -27,7 +27,7 @@ func NewContainer(
 		CreateAccQSize: 10000,
 		FindAccQSize:   3000,
 		ReadBatchSize:  100,
-		WriteBatchSize: 2000,
+		WriteBatchSize: 5000,
 		WaitTimeoutMs:  10,
 	}, usc)
 	svc := service.NewService(svcRepo)
