@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"context"
+
 	"github.com/google/uuid"
 
 	"go-resilient-ledger/internal/account/entity"
@@ -11,6 +13,7 @@ import (
 type Repo interface {
 	BulkSaveNew(data []entity.Account) error
 	BulkFindByIds(ids []string) (map[string]AccountMapVal, error)
+	SaveNew(ctx context.Context, data entity.Account) error
 }
 
 type Usecase struct {
@@ -78,4 +81,17 @@ func (u *Usecase) BulkFindAccounts(data []findacc.WQdata) {
 		}
 		item.Reply <- output
 	}
+}
+
+func (u *Usecase) IndividualCreateAccount(ctx context.Context, data createacc.Input) error {
+	account, err := entity.NewAccount(
+		uuid.NewString(),
+		data.Name,
+		data.Balance,
+	)
+	if err != nil {
+		return err
+	}
+	err = u.repo.SaveNew(ctx, account)
+	return err
 }

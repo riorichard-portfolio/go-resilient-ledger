@@ -1,6 +1,8 @@
 package gormrepo
 
 import (
+	"context"
+
 	"github.com/cockroachdb/errors"
 	"gorm.io/gorm"
 
@@ -53,4 +55,17 @@ func (gr *GormRepo) BulkFindByIds(ids []string) (map[string]usecase.AccountMapVa
 		}
 	}
 	return result, nil
+}
+
+func (gr *GormRepo) SaveNew(ctx context.Context, data entity.Account) error {
+	err := gr.db.WithContext(ctx).
+		Create(AccountGorm{
+			ID:      data.ID(),
+			Name:    data.Name(),
+			Balance: data.Balance(),
+		}).Error
+	if err != nil {
+		return errors.Wrap(err, "failed to individual save account")
+	}
+	return nil
 }
